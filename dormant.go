@@ -1,16 +1,16 @@
 package main
 
 import (
-	"fmt"
 	"os"
 
 	"github.com/iljaSL/dormant/cmd"
+	"github.com/pterm/pterm"
 )
 
 //
 func main() {
 	if err := cmd.Execute(); err != nil {
-		fmt.Fprintf(os.Stderr, "Error: %v\n", err)
+		pterm.Error.Println(err)
 		os.Exit(1)
 	}
 }
