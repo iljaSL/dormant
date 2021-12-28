@@ -41,7 +41,7 @@ func inspectModFileCmd() *cobra.Command {
 func inspectModFile(args []string) error {
 	deps := lib.ReadFile(args[0])
 
-	// Next Step using gitHubs and gitLabs REST API to get the status
+	// Todo: Next Step using gitHubs and gitLabs REST API to get the status
 
 	return stdout(deps)
 }

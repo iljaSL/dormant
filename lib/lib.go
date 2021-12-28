@@ -50,8 +50,8 @@ func ReadFile(arg string) []Deps {
 	return deps
 }
 
-// Only URL is not enough, need to get Username and Repo name from the URL
-// to be able to use it with the GitHub API
+// Todo: Only URL is not enough, need to get Username and Repo name from the URL
+// Todo: to be able to use it with the GitHub API
 
 // Getting the last recent commit page of repo with curl
 //  curl \
