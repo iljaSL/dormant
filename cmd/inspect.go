@@ -40,12 +40,12 @@ func inspectModFileCmd() *cobra.Command {
 }
 
 func inspectModFile(args []string) error {
-	fmt.Println("TEST FLAG", testFlag)
+	fmt.Println("TEST FLAG", inactivityDuration)
 
 	deps := lib.ReadFile(args[0])
 
 	// Todo: Next Step using gitHubs and gitLabs REST API to get the status
-
+	// ! Before doing any CURL action, check if inactivityDuration is not 0
 	return stdout(deps)
 }
 

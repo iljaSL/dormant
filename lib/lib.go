@@ -10,9 +10,11 @@ import (
 )
 
 type Deps struct {
-	URL      string
-	Version  string
-	Indirect bool
+	URL            string
+	Username       string
+	RepositoryName string
+	Version        string
+	Indirect       bool
 }
 
 func ReadFile(arg string) []Deps {
@@ -29,16 +31,20 @@ func ReadFile(arg string) []Deps {
 	scanner := bufio.NewScanner(f)
 
 	reGitLink := regexp.MustCompile(`git[^\s]+`)
-	reVersion := regexp.MustCompile(`v[0-9][^a-z][^\s]+`)
+	reURLDetails := regexp.MustCompile(`[^\/\s]{1,}`)
 
 	// Skip first line of go.mod, as it is the applications module name
 	scanner.Scan()
 	for scanner.Scan() {
 		if strings.Contains(scanner.Text(), "git") {
+			URLDetails := reURLDetails.FindAllString(scanner.Text(), 4)
+
 			deps = append(deps, Deps{
-				URL:      reGitLink.FindString(scanner.Text()),
-				Version:  reVersion.FindString(scanner.Text()),
-				Indirect: strings.Contains(scanner.Text(), "indirect"),
+				URL:            reGitLink.FindString(scanner.Text()),
+				Username:       URLDetails[1],
+				RepositoryName: URLDetails[2],
+				Version:        URLDetails[3],
+				Indirect:       strings.Contains(scanner.Text(), "indirect"),
 			})
 		}
 	}

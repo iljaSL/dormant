@@ -9,8 +9,8 @@ import (
 )
 
 var (
-	testFlag = "test"
-	cfgFile  string
+	inactivityDuration uint = 6 // months
+	cfgFile            string
 
 	rootCmd = &cobra.Command{
 		Use:   "dormant",
@@ -39,14 +39,7 @@ func root(cmd *cobra.Command, args []string) {
 func init() {
 	cobra.OnInitialize(initConfig)
 
-	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.cobra.yaml)")
-	rootCmd.PersistentFlags().StringP("author", "a", "YOUR NAME", "author name for copyright attribution")
-	rootCmd.PersistentFlags().Bool("viper", true, "use Viper for configuration")
-	viper.BindPFlag("author", rootCmd.PersistentFlags().Lookup("author"))
-	viper.BindPFlag("useViper", rootCmd.PersistentFlags().Lookup("viper"))
-	viper.SetDefault("author", "NAME HERE <EMAIL ADDRESS>")
-	viper.SetDefault("license", "apache")
-
+	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.dormant.yaml)")
 }
 
 func initConfig() {
@@ -54,14 +47,13 @@ func initConfig() {
 		// Use config file from the flag.
 		viper.SetConfigFile(cfgFile)
 	} else {
-		// Find home directory.
 		home, err := os.UserHomeDir()
 		cobra.CheckErr(err)
 
-		// Search config in home directory with name ".cobra" (without extension).
+		// Search config in home directory with name ".dormant" (without extension).
 		viper.AddConfigPath(home)
 		viper.SetConfigType("yaml")
-		viper.SetConfigName(".cobra")
+		viper.SetConfigName(".dormant")
 	}
 
 	viper.AutomaticEnv()
@@ -69,6 +61,8 @@ func initConfig() {
 	if err := viper.ReadInConfig(); err == nil {
 		pterm.Info.Println("Using config file:", viper.ConfigFileUsed())
 
-		testFlag = viper.GetString("testFlag")
+		if viper.IsSet("inactivityDuration") {
+			inactivityDuration = viper.GetUint("inactivityDuration")
+		}
 	}
 }
