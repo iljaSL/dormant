@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"encoding/json"
+	"fmt"
 	"os"
 
 	"github.com/iljaSL/dormant/lib"
@@ -39,9 +40,11 @@ func inspectModFileCmd() *cobra.Command {
 }
 
 func inspectModFile(args []string) error {
+	fmt.Println("TEST FLAG", testFlag)
+
 	deps := lib.ReadFile(args[0])
 
-	// Next Step using gitHubs and gitLabs REST API to get the status
+	// Todo: Next Step using gitHubs and gitLabs REST API to get the status
 
 	return stdout(deps)
 }
