@@ -92,7 +92,7 @@ func GetAPIInfo(deps []model.Deps) error {
 			pterm.Error.Println("URL could not be handled")
 		}
 	}
-
+	fmt.Println("TEMP RES LOG", result)
 	return nil
 }
 
