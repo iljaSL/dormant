@@ -1,9 +1,7 @@
 package cmd
 
 import (
-	"encoding/json"
 	"fmt"
-	"os"
 
 	"github.com/iljaSL/dormant/lib"
 	"github.com/spf13/cobra"
@@ -42,22 +40,28 @@ func inspectModFileCmd() *cobra.Command {
 func inspectModFile(args []string) error {
 	fmt.Println("TEST FLAG", inactivityDuration)
 
-	deps := lib.ReadFile(args[0])
-
-	// Todo: Next Step using gitHubs and gitLabs REST API to get the status
-	// ! Before doing any CURL action, check if inactivityDuration is not 0
-	return stdout(deps)
-}
-
-func stdout(data interface{}) error {
-	encoded, err := json.Marshal(data)
+	deps, err := lib.ReadFile(args[0])
 	if err != nil {
 		return err
 	}
 
-	_, err = os.Stdout.Write(encoded)
+	fmt.Println("DEPS", deps)
+	err = lib.GetAPIInfo(deps)
+
+	// Todo: Next Step using gitHubs and gitLabs REST API to get the status
+	// ! Before doing any CURL action, check if inactivityDuration is not 0
 	return err
 }
+
+// func stdout(data interface{}) error {
+// 	encoded, err := json.Marshal(data)
+// 	if err != nil {
+// 		return err
+// 	}
+
+// 	_, err = os.Stdout.Write(encoded)
+// 	return err
+// }
 
 //
 //
