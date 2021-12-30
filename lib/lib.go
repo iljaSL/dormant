@@ -5,11 +5,11 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
-	"log"
 	"net/http"
 	"os"
 	"regexp"
 	"strings"
+	"time"
 
 	"github.com/iljaSL/dormant/model"
 	"github.com/pterm/pterm"
@@ -54,9 +54,6 @@ func ReadFile(arg string) ([]model.Deps, error) {
 	return deps, err
 }
 
-// Todo: Only URL is not enough, need to get Username and Repo name from the URL
-// Todo: to be able to use it with the GitHub API
-
 // Getting the last recent commit page of repo with curl
 //  curl \
 //  -H "Accept: application/vnd.github.v3+json" \
@@ -69,16 +66,21 @@ func ReadFile(arg string) ([]model.Deps, error) {
 //  https://api.github.com/repos/pterm/pterm/commits?since=2021-05-17T14:20:35Z
 // Current Time - Config Time (default: 6 months) for 'since' time
 
-// Todo: Better Name for function, as it only handles the commit date get info
-func GetAPIInfo(deps []model.Deps) error {
+// GetAPILastActivityInfo get the last recent project activity
+// infos for go.mod dependencies
+func GetAPILastActivityInfo(deps []model.Deps) ([]model.InspectResult, error) {
 	result := []model.InspectResult{}
 
 	for _, v := range deps {
 		switch {
 		case strings.Contains(v.URL, "github"):
-			res, _ := handleGitHubURL(v.Username, v.RepositoryName)
+			res, err := handleGitHubURL(v.Username, v.RepositoryName)
+			if err != nil {
+				return nil, err
+			}
 
 			result = append(result, model.InspectResult{
+				URL:        v.URL,
 				LastCommit: res[0].Commit.Author.Date,
 			})
 		case strings.Contains(v.URL, "gitlab"):
@@ -92,30 +94,87 @@ func GetAPIInfo(deps []model.Deps) error {
 			pterm.Error.Println("URL could not be handled")
 		}
 	}
-	fmt.Println("TEMP RES LOG", result)
-	return nil
+
+	return result, nil
 }
 
 func handleGitHubURL(username, reponame string) ([]model.GitHubCommit, error) {
+	gitHubCommitInfo := []model.GitHubCommit{}
 	preparedURL := fmt.Sprintf("https://api.github.com/repos/%s/%s/commits?per_page=1",
 		username, reponame)
 
 	resp, err := http.Get(preparedURL)
 	if err != nil {
-		log.Fatalln(err)
+		return nil, err
 	}
 
-	// We Read the response body on the line below.
 	body, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		log.Fatalln(err)
-	}
-
-	var data []model.GitHubCommit
-	err = json.Unmarshal(body, &data)
 	if err != nil {
 		return nil, err
 	}
 
-	return data, nil
+	err = json.Unmarshal(body, &gitHubCommitInfo)
+	if err != nil {
+		return nil, err
+	}
+
+	return gitHubCommitInfo, err
+}
+
+func CalculateDepsActivity(activityInfo []model.InspectResult) error {
+	lastActivityDiff := []model.LastActivityDiff{}
+	layout := "2006-01-02T15:04:05Z0700"
+	test := time.Now()
+
+	currentDate := time.Date(test.Year(), test.Month(), test.Day(),
+		test.Hour(), test.Minute(), test.Second(), test.Nanosecond(), time.UTC)
+
+	for _, v := range activityInfo {
+		commitDate, err := time.Parse(layout, v.LastCommit)
+		if err != nil {
+			return err
+		}
+
+		year, month, day := TimeElapsed(currentDate, commitDate)
+
+		lastActivityDiff = append(lastActivityDiff, model.LastActivityDiff{
+			URL:   v.URL,
+			Year:  year,
+			Month: month,
+			Day:   day,
+		})
+
+	}
+	fmt.Println(lastActivityDiff)
+
+	return nil
+}
+
+func TimeElapsed(a, b time.Time) (int, int, int) {
+	if a.Location() != b.Location() {
+		b = b.In(a.Location())
+	}
+	if a.After(b) {
+		a, b = b, a
+	}
+	y1, M1, d1 := a.Date()
+	y2, M2, d2 := b.Date()
+
+	year := int(y2 - y1)
+	month := int(M2 - M1)
+	day := int(d2 - d1)
+
+	// Normalize negative values
+	if day < 0 {
+		// days in month:
+		t := time.Date(y1, M1, 32, 0, 0, 0, 0, time.UTC)
+		day += 32 - t.Day()
+		month--
+	}
+	if month < 0 {
+		month += 12
+		year--
+	}
+
+	return year, month, day
 }

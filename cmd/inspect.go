@@ -45,8 +45,10 @@ func inspectModFile(args []string) error {
 		return err
 	}
 
-	fmt.Println("DEPS", deps)
-	err = lib.GetAPIInfo(deps)
+	activityInfo, _ := lib.GetAPILastActivityInfo(deps)
+
+	depsActivityList := lib.CalculateDepsActivity(activityInfo)
+	fmt.Println(depsActivityList)
 
 	// Todo: Next Step using gitHubs and gitLabs REST API to get the status
 	// ! Before doing any CURL action, check if inactivityDuration is not 0

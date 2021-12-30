@@ -9,6 +9,14 @@ type Deps struct {
 	Indirect       bool
 }
 
+// LastActivityDiff difference since the last activity definition
+type LastActivityDiff struct {
+	URL   string
+	Year  int
+	Month int
+	Day   int
+}
+
 // InspectResult result definition for the inspect flag
 type InspectResult struct {
 	URL        string
