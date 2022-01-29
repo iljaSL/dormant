@@ -121,18 +121,18 @@ func handleGitHubURL(username, reponame string) ([]model.GitHubCommit, error) {
 	return gitHubCommitInfo, err
 }
 
-func CalculateDepsActivity(activityInfo []model.InspectResult) error {
+func CalculateDepsActivity(activityInfo []model.InspectResult) ([]model.LastActivityDiff, error) {
 	lastActivityDiff := []model.LastActivityDiff{}
 	layout := "2006-01-02T15:04:05Z0700"
-	test := time.Now()
+	t := time.Now()
 
-	currentDate := time.Date(test.Year(), test.Month(), test.Day(),
-		test.Hour(), test.Minute(), test.Second(), test.Nanosecond(), time.UTC)
+	currentDate := time.Date(t.Year(), t.Month(), t.Day(),
+		t.Hour(), t.Minute(), t.Second(), t.Nanosecond(), time.UTC)
 
 	for _, v := range activityInfo {
 		commitDate, err := time.Parse(layout, v.LastCommit)
 		if err != nil {
-			return err
+			return nil, err
 		}
 
 		year, month, day := TimeElapsed(currentDate, commitDate)
@@ -143,11 +143,9 @@ func CalculateDepsActivity(activityInfo []model.InspectResult) error {
 			Month: month,
 			Day:   day,
 		})
-
 	}
-	fmt.Println(lastActivityDiff)
 
-	return nil
+	return lastActivityDiff, nil
 }
 
 func TimeElapsed(a, b time.Time) (int, int, int) {
