@@ -2,8 +2,10 @@ package cmd
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/iljaSL/dormant/lib"
+	"github.com/pterm/pterm"
 	"github.com/spf13/cobra"
 )
 
@@ -45,13 +47,36 @@ func inspectModFile(args []string) error {
 		return err
 	}
 
-	activityInfo, _ := lib.GetAPILastActivityInfo(deps)
+	activityInfo, err := lib.GetAPILastActivityInfo(deps)
+	if err != nil {
+		return err
+	}
 
-	depsActivityList := lib.CalculateDepsActivity(activityInfo)
-	fmt.Println(depsActivityList)
+	depsLastActivityList, err := lib.CalculateDepsActivity(activityInfo)
+	if err != nil {
+		return err
+	}
 
-	// Todo: Next Step using gitHubs and gitLabs REST API to get the status
-	// ! Before doing any CURL action, check if inactivityDuration is not 0
+	p, _ := pterm.DefaultProgressbar.WithTotal(len(depsLastActivityList)).Start()
+	d := pterm.TableData{{"Dependencies", "Status", "Size"}}
+
+	// ! Check if activityDuration is not 0!!!
+	// ! REMOVE HARDCODED MONTHS
+	for _, v := range depsLastActivityList {
+		p.UpdateTitle("Analyzing " + v.URL) // Update the title of the progressbar.
+		// pterm.Success.Println("Analyzing " + v.URL)
+		if v.Month <= 6 && v.Month >= 4 {
+			d = append(d, []string{pterm.LightYellow(v.URL), pterm.LightYellow("Sporadic")})
+		} else if v.Month <= 3 {
+			d = append(d, []string{pterm.LightGreen(v.URL), pterm.LightGreen("Active")})
+		} else {
+			d = append(d, []string{pterm.LightRed(v.URL), pterm.LightRed("Inactive")})
+		}
+		p.Increment() // Increment the progressbar by one. Use Add(x int) to increment by a custom amount.
+		time.Sleep(time.Millisecond * 250)
+	}
+	pterm.DefaultTable.WithHasHeader().WithData(d).Render()
+
 	return err
 }
 
