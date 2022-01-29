@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	"fmt"
 	"os"
 
 	"github.com/pterm/pterm"
@@ -28,7 +27,7 @@ that are not being actively maintained anymore.
 // Execute executes the root command.
 func Execute() {
 	if err := rootCmd.Execute(); err != nil {
-		fmt.Fprintln(os.Stderr, err)
+		pterm.Error.Println(err)
 		os.Exit(1)
 	}
 }

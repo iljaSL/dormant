@@ -3,6 +3,7 @@ package lib
 import (
 	"bufio"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -135,7 +136,10 @@ func CalculateDepsActivity(activityInfo []model.InspectResult) ([]model.LastActi
 			return nil, err
 		}
 
-		year, month, day := TimeElapsed(currentDate, commitDate)
+		year, month, day, err := TimeElapsed(currentDate, commitDate)
+		if err != nil {
+			return nil, err
+		}
 
 		lastActivityDiff = append(lastActivityDiff, model.LastActivityDiff{
 			URL:   v.URL,
@@ -148,7 +152,11 @@ func CalculateDepsActivity(activityInfo []model.InspectResult) ([]model.LastActi
 	return lastActivityDiff, nil
 }
 
-func TimeElapsed(a, b time.Time) (int, int, int) {
+func TimeElapsed(a, b time.Time) (int, int, int, error) {
+	if b.IsZero() {
+		return 0, 0, 0, errors.New("wrong time format")
+	}
+
 	if a.Location() != b.Location() {
 		b = b.In(a.Location())
 	}
@@ -174,5 +182,5 @@ func TimeElapsed(a, b time.Time) (int, int, int) {
 		year--
 	}
 
-	return year, month, day
+	return year, month, day, nil
 }
