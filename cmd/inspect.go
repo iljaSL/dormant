@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	"fmt"
 	"time"
 
 	"github.com/iljaSL/dormant/lib"
@@ -25,7 +24,7 @@ func inspectModFileCmd() *cobra.Command {
 		Short: "Inspect a go.mod file for inactive packages.",
 		Long:  `Inspect a go.mod file for inactive packages.`,
 		Example: `
-	dormant inspect <GO.MOD>
+	dormant inspect go.mod
 		`,
 		Args:         cobra.ExactArgs(1),
 		SilenceUsage: true,
@@ -40,8 +39,6 @@ func inspectModFileCmd() *cobra.Command {
 }
 
 func inspectModFile(args []string) error {
-	fmt.Println("TEST FLAG", inactivityDuration)
-
 	deps, err := lib.ReadFile(args[0])
 	if err != nil {
 		return err

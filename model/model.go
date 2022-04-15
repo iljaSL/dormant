@@ -1,5 +1,11 @@
 package model
 
+const (
+	GITHUB = "github"
+	GITLAB = "gitlab"
+	GIT    = "git"
+)
+
 // Deps go.mod dependency definition
 type Deps struct {
 	URL            string
