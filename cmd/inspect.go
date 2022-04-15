@@ -25,7 +25,7 @@ func inspectModFileCmd() *cobra.Command {
 		Short: "Inspect a go.mod file for inactive packages.",
 		Long:  `Inspect a go.mod file for inactive packages.`,
 		Example: `
-	dormant inspect <GO.MOD>
+	dormant inspect go.mod
 		`,
 		Args:         cobra.ExactArgs(1),
 		SilenceUsage: true,
@@ -40,6 +40,7 @@ func inspectModFileCmd() *cobra.Command {
 }
 
 func inspectModFile(args []string) error {
+	// ! inactivityDuration Need to replace hardcoded months
 	fmt.Println("TEST FLAG", inactivityDuration)
 
 	deps, err := lib.ReadFile(args[0])

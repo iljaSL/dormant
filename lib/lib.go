@@ -35,7 +35,7 @@ func ReadFile(arg string) ([]model.Deps, error) {
 	// Skip first line of go.mod, as it is the applications module name
 	scanner.Scan()
 	for scanner.Scan() {
-		if strings.Contains(scanner.Text(), "git") {
+		if strings.Contains(scanner.Text(), model.GIT) {
 			URLDetails := reURLDetails.FindAllString(scanner.Text(), 4)
 
 			deps = append(deps, model.Deps{
@@ -74,7 +74,7 @@ func GetAPILastActivityInfo(deps []model.Deps) ([]model.InspectResult, error) {
 
 	for _, v := range deps {
 		switch {
-		case strings.Contains(v.URL, "github"):
+		case strings.Contains(v.URL, model.GITHUB):
 			res, err := handleGitHubURL(v.Username, v.RepositoryName)
 			if err != nil {
 				return nil, err
@@ -84,7 +84,7 @@ func GetAPILastActivityInfo(deps []model.Deps) ([]model.InspectResult, error) {
 				URL:        v.URL,
 				LastCommit: res[0].Commit.Author.Date,
 			})
-		case strings.Contains(v.URL, "gitlab"):
+		case strings.Contains(v.URL, model.GITLAB):
 			// TODO HANDLE DATA WITH GITLAB API
 			// https://stackoverflow.com/questions/39559689/where-do-i-find-the-project-id-for-the-gitlab-api
 			// console.log(document.body.attributes[6])
@@ -107,6 +107,10 @@ func handleGitHubURL(username, reponame string) ([]model.GitHubCommit, error) {
 	resp, err := http.Get(preparedURL)
 	if err != nil {
 		return nil, err
+	}
+
+	if resp.StatusCode == http.StatusForbidden {
+		return nil, fmt.Errorf("API rate limit exceeded for your IP address, authenticated requests feature is comming soon")
 	}
 
 	body, err := ioutil.ReadAll(resp.Body)
