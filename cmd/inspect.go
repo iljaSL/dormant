@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/iljaSL/dormant/lib"
@@ -39,6 +40,9 @@ func inspectModFileCmd() *cobra.Command {
 }
 
 func inspectModFile(args []string) error {
+	// ! inactivityDuration Need to replace hardcoded months
+	fmt.Println("TEST FLAG", inactivityDuration)
+
 	deps, err := lib.ReadFile(args[0])
 	if err != nil {
 		return err
