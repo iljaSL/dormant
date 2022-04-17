@@ -140,25 +140,25 @@ func CalculateDepsActivity(activityInfo []model.InspectResult) ([]model.LastActi
 			return nil, err
 		}
 
-		year, month, day, err := TimeElapsed(currentDate, commitDate)
+		year, month, err := TimeElapsed(currentDate, commitDate)
 		if err != nil {
 			return nil, err
 		}
 
+		month = month + (year * 12)
+
 		lastActivityDiff = append(lastActivityDiff, model.LastActivityDiff{
 			URL:   v.URL,
-			Year:  year,
 			Month: month,
-			Day:   day,
 		})
 	}
 
 	return lastActivityDiff, nil
 }
 
-func TimeElapsed(a, b time.Time) (int, int, int, error) {
+func TimeElapsed(a, b time.Time) (int, int, error) {
 	if b.IsZero() {
-		return 0, 0, 0, errors.New("wrong time format")
+		return 0, 0, errors.New("wrong time format")
 	}
 
 	if a.Location() != b.Location() {
@@ -186,5 +186,5 @@ func TimeElapsed(a, b time.Time) (int, int, int, error) {
 		year--
 	}
 
-	return year, month, day, nil
+	return year, month, nil
 }
