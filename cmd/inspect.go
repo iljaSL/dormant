@@ -39,7 +39,7 @@ func inspectModFileCmd() *cobra.Command {
 }
 
 func inspectModFile(args []string) error {
-	deps, err := lib.ReadFile(args[0])
+	deps, err := lib.ReadGoModFile(args[0])
 	if err != nil {
 		return err
 	}

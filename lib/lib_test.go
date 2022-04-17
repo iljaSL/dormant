@@ -79,3 +79,47 @@ func TestCalculateDepsActivity(t *testing.T) {
 		})
 	}
 }
+
+func TestReadGoModFile(t *testing.T) {
+	type args struct {
+		arg string
+	}
+	tests := []struct {
+		name    string
+		args    args
+		want    []model.Deps
+		wantErr bool
+	}{
+		{
+			name: "correct go mod file read",
+			args: args{
+				"./test.mod",
+			},
+			want: []model.Deps{
+				{
+					URL:            "github.com/spf13/viper",
+					Username:       "spf13",
+					RepositoryName: "viper",
+					Version:        "v1.11.0",
+					Indirect:       false,
+				},
+			},
+		},
+		{
+			name:    "file does not exist",
+			wantErr: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := ReadGoModFile(tt.args.arg)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("ReadFile() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("ReadFile() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
