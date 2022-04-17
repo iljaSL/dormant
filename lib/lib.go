@@ -16,7 +16,7 @@ import (
 	"github.com/pterm/pterm"
 )
 
-func ReadFile(arg string) ([]model.Deps, error) {
+func ReadGoModFile(arg string) ([]model.Deps, error) {
 	deps := []model.Deps{}
 
 	f, err := os.Open(arg)
