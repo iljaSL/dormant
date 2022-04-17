@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	"fmt"
 	"time"
 
 	"github.com/iljaSL/dormant/lib"
@@ -40,9 +39,6 @@ func inspectModFileCmd() *cobra.Command {
 }
 
 func inspectModFile(args []string) error {
-	// ! inactivityDuration Need to replace hardcoded months
-	fmt.Println("TEST FLAG", inactivityDuration)
-
 	deps, err := lib.ReadFile(args[0])
 	if err != nil {
 		return err
@@ -59,19 +55,17 @@ func inspectModFile(args []string) error {
 	}
 
 	p, _ := pterm.DefaultProgressbar.WithTotal(len(depsLastActivityList)).Start()
-	d := pterm.TableData{{"Dependencies", "Status", "Size"}}
+	d := pterm.TableData{{"Dependencies", "Status", "Last Activity (months)"}}
 
-	// ! Check if activityDuration is not 0!!!
-	// ! REMOVE HARDCODED MONTHS
 	for _, v := range depsLastActivityList {
 		p.UpdateTitle("Analyzing " + v.URL) // Update the title of the progressbar.
 		// pterm.Success.Println("Analyzing " + v.URL)
-		if v.Month <= 6 && v.Month >= 4 {
-			d = append(d, []string{pterm.LightYellow(v.URL), pterm.LightYellow("Sporadic")})
-		} else if v.Month <= 3 {
-			d = append(d, []string{pterm.LightGreen(v.URL), pterm.LightGreen("Active")})
+		if v.Month <= inactivityDuration && v.Month >= sporadicDuration {
+			d = append(d, []string{pterm.LightYellow(v.URL), pterm.LightYellow("Sporadic"), pterm.LightYellow(v.Month)})
+		} else if v.Month < sporadicDuration && !(sporadicDuration > inactivityDuration) {
+			d = append(d, []string{pterm.LightGreen(v.URL), pterm.LightGreen("Active"), pterm.LightGreen(v.Month)})
 		} else {
-			d = append(d, []string{pterm.LightRed(v.URL), pterm.LightRed("Inactive")})
+			d = append(d, []string{pterm.LightRed(v.URL), pterm.LightRed("Inactive"), pterm.LightRed(v.Month)})
 		}
 		p.Increment() // Increment the progressbar by one. Use Add(x int) to increment by a custom amount.
 		time.Sleep(time.Millisecond * 250)

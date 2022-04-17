@@ -18,13 +18,10 @@ func TestTimeElapsed(t *testing.T) {
 		givenTime     string
 		expectedYear  int
 		expectedMonth int
-		expectedDay   int
 	}{
-		{"2018-07-01T00:00:00Z", 3, 6, 2},
-		{"1969-09-15T00:00:00Z", 52, 3, 18},
-		{"1692-09-15T00:00:00Z", 329, 3, 18},
-		// Leap year is not considered yet in TimeElapsed
-		// {"2016-02-29T00:00:00Z", 5, 10, 5},
+		{"2018-07-01T00:00:00Z", 3, 6},
+		{"1969-09-15T00:00:00Z", 52, 3},
+		{"1692-09-15T00:00:00Z", 329, 3},
 	}
 
 	tablesTwo := []struct {
@@ -40,18 +37,17 @@ func TestTimeElapsed(t *testing.T) {
 			t.Errorf("parse error occurred: %t", err)
 		}
 
-		year, month, day, _ := TimeElapsed(currentDate, commitDate)
-		if year != table.expectedYear || month != table.expectedMonth ||
-			day != table.expectedDay {
-			t.Errorf("outcome was incorrect,\n year - got: %d, want: %d\n month - got: %d, want %d\n day - got %d, want %d\n",
-				year, table.expectedYear, month, table.expectedMonth, day, table.expectedDay)
+		year, month, _ := TimeElapsed(currentDate, commitDate)
+		if year != table.expectedYear || month != table.expectedMonth {
+			t.Errorf("outcome was incorrect,\n year - got: %d, want: %d\n month - got: %d want: %d\n",
+				year, table.expectedYear, month, table.expectedMonth)
 		}
 	}
 
 	for _, table := range tablesTwo {
 		commitDate, _ := time.Parse(layout, table.givenTime)
 
-		_, _, _, err := TimeElapsed(currentDate, commitDate)
+		_, _, err := TimeElapsed(currentDate, commitDate)
 		if err == nil {
 			t.Errorf("an error should have occurred")
 		}

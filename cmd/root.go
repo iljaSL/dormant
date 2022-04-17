@@ -9,7 +9,8 @@ import (
 )
 
 var (
-	inactivityDuration uint = 6 // months
+	inactivityDuration int = 6 // months
+	sporadicDuration   int = 4 // months
 	cfgFile            string
 
 	rootCmd = &cobra.Command{
@@ -62,7 +63,8 @@ func initConfig() {
 		pterm.Info.Println("Using config file:", viper.ConfigFileUsed())
 
 		if viper.IsSet("inactivityDuration") {
-			inactivityDuration = viper.GetUint("inactivityDuration")
+			inactivityDuration = viper.GetInt("inactivityDuration")
+			sporadicDuration = viper.GetInt("inactivityDuration")
 		}
 	}
 }
