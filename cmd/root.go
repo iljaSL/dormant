@@ -64,7 +64,7 @@ func initConfig() {
 
 		if viper.IsSet("inactivityDuration") {
 			inactivityDuration = viper.GetInt("inactivityDuration")
-			sporadicDuration = viper.GetInt("inactivityDuration")
+			sporadicDuration = viper.GetInt("sporadicDuration")
 		}
 	}
 }
