@@ -55,18 +55,6 @@ func ReadGoModFile(arg string) ([]model.Deps, error) {
 	return deps, err
 }
 
-// Getting the last recent commit page of repo with curl
-//  curl \
-//  -H "Accept: application/vnd.github.v3+json" \
-//  https://api.github.com/repos/pterm/pterm/commits\?per_page\=1
-// Time Format: 2021-11-17T14:20:35Z
-
-// Getting the amount of commits since 6 moths with curl
-//  curl \
-//  -H "Accept: application/vnd.github.v3+json" \
-//  https://api.github.com/repos/pterm/pterm/commits?since=2021-05-17T14:20:35Z
-// Current Time - Config Time (default: 6 months) for 'since' time
-
 // GetAPILastActivityInfo get the last recent project activity
 // infos for go.mod dependencies
 func GetAPILastActivityInfo(deps []model.Deps) ([]model.InspectResult, error) {
@@ -84,13 +72,6 @@ func GetAPILastActivityInfo(deps []model.Deps) ([]model.InspectResult, error) {
 				URL:        v.URL,
 				LastCommit: res[0].Commit.Author.Date,
 			})
-		case strings.Contains(v.URL, model.GITLAB):
-			// TODO HANDLE DATA WITH GITLAB API
-			// https://stackoverflow.com/questions/39559689/where-do-i-find-the-project-id-for-the-gitlab-api
-			// console.log(document.body.attributes[6])
-			// https://gitlab.com/api/v4/projects/24747998
-			// https://docs.gitlab.com/ee/api/projects.html#get-single-project
-			//
 		default:
 			pterm.Error.Println("URL could not be handled")
 		}

@@ -123,3 +123,52 @@ func TestReadGoModFile(t *testing.T) {
 		})
 	}
 }
+
+func TestGetAPILastActivityInfo(t *testing.T) {
+	type args struct {
+		deps []model.Deps
+	}
+	tests := []struct {
+		name    string
+		args    args
+		want    []model.InspectResult
+		wantErr bool
+	}{
+		{
+			name:    "empty struct error",
+			want:    []model.InspectResult{},
+			wantErr: true,
+		},
+		{
+			name: "check non supported url",
+			args: args{
+				deps: []model.Deps{
+					{
+						URL: "doesnotexist.com",
+					},
+				},
+			},
+			want: []model.InspectResult{},
+		},
+		{
+			name: "check faulty github repo",
+			args: args{
+				deps: []model.Deps{
+					{
+						URL: "github.com/sdsd/viadsaper",
+					},
+				},
+			},
+			want:    nil,
+			wantErr: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, _ := GetAPILastActivityInfo(tt.args.deps)
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("GetAPILastActivityInfo() = %v,\n want %v\n", got, tt.want)
+			}
+		})
+	}
+}
