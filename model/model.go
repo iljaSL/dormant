@@ -2,7 +2,6 @@ package model
 
 const (
 	GITHUB = "github"
-	GITLAB = "gitlab"
 	GIT    = "git"
 )
 
