@@ -1,8 +1,6 @@
 package cmd
 
 import (
-	"time"
-
 	"github.com/iljaSL/dormant/lib"
 	"github.com/pterm/pterm"
 	"github.com/spf13/cobra"
@@ -67,8 +65,7 @@ func inspectModFile(args []string) error {
 		} else {
 			d = append(d, []string{pterm.LightRed(v.URL), pterm.LightRed("Inactive"), pterm.LightRed(v.Month)})
 		}
-		p.Increment() // Increment the progressbar by one. Use Add(x int) to increment by a custom amount.
-		time.Sleep(time.Millisecond * 150)
+		p.Increment() // Increment the progress bar by one. Use Add(x int) to increment by a custom amount.
 	}
 	pterm.DefaultTable.WithHasHeader().WithData(d).Render()
 

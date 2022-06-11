@@ -13,7 +13,6 @@ import (
 	"time"
 
 	"github.com/iljaSL/dormant/model"
-	"github.com/pterm/pterm"
 )
 
 func ReadGoModFile(arg string) ([]model.Deps, error) {
@@ -73,7 +72,7 @@ func GetAPILastActivityInfo(deps []model.Deps) ([]model.InspectResult, error) {
 				LastCommit: res[0].Commit.Author.Date,
 			})
 		default:
-			pterm.Error.Println("URL could not be handled")
+			return nil, fmt.Errorf("URL could not be handled")
 		}
 	}
 
@@ -94,6 +93,10 @@ func handleGitHubURL(username, reponame string) ([]model.GitHubCommit, error) {
 		return nil, fmt.Errorf("API rate limit exceeded for your IP address, authenticated requests feature is comming soon")
 	}
 
+	if resp.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("API call failed")
+	}
+
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		return nil, err
@@ -107,6 +110,7 @@ func handleGitHubURL(username, reponame string) ([]model.GitHubCommit, error) {
 	return gitHubCommitInfo, err
 }
 
+// CalculateDepsActivity calculate the dependency activity duration
 func CalculateDepsActivity(activityInfo []model.InspectResult) ([]model.LastActivityDiff, error) {
 	lastActivityDiff := []model.LastActivityDiff{}
 	layout := "2006-01-02T15:04:05Z0700"
