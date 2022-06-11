@@ -54,32 +54,6 @@ func TestTimeElapsed(t *testing.T) {
 	}
 }
 
-func TestCalculateDepsActivity(t *testing.T) {
-	type args struct {
-		activityInfo []model.InspectResult
-	}
-	tests := []struct {
-		name    string
-		args    args
-		want    []model.LastActivityDiff
-		wantErr bool
-	}{
-		// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			got, err := CalculateDepsActivity(tt.args.activityInfo)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("CalculateDepsActivity() error = %v, wantErr %v", err, tt.wantErr)
-				return
-			}
-			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("CalculateDepsActivity() = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
-
 func TestReadGoModFile(t *testing.T) {
 	type args struct {
 		arg string
@@ -148,7 +122,7 @@ func TestGetAPILastActivityInfo(t *testing.T) {
 					},
 				},
 			},
-			want: []model.InspectResult{},
+			wantErr: true,
 		},
 		{
 			name: "check faulty github repo",
@@ -168,6 +142,79 @@ func TestGetAPILastActivityInfo(t *testing.T) {
 			got, _ := GetAPILastActivityInfo(tt.args.deps)
 			if !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("GetAPILastActivityInfo() = %v,\n want %v\n", got, tt.want)
+			}
+		})
+	}
+}
+
+func Test_handleGitHubURL(t *testing.T) {
+	type args struct {
+		username string
+		reponame string
+	}
+	tests := []struct {
+		name    string
+		args    args
+		want    []model.GitHubCommit
+		wantErr bool
+	}{
+		{
+			name: "test",
+			args: args{
+				username: "test",
+				reponame: "testRepo",
+			},
+			wantErr: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := handleGitHubURL(tt.args.username, tt.args.reponame)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("handleGitHubURL() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("handleGitHubURL() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestCalculateDepsActivity(t *testing.T) {
+	type args struct {
+		activityInfo []model.InspectResult
+	}
+	tests := []struct {
+		name    string
+		args    args
+		want    []model.LastActivityDiff
+		wantErr bool
+	}{
+		{
+			name: "empty struct",
+			args: args{},
+			want: []model.LastActivityDiff{},
+		},
+		{
+			name: "wring time format",
+			args: args{
+				[]model.InspectResult{
+					{
+						URL:        "github.com/test/test",
+						LastCommit: time.Now().String(),
+					},
+				},
+			},
+			wantErr: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			_, err := CalculateDepsActivity(tt.args.activityInfo)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("CalculateDepsActivity() error = %v, wantErr %v", err, tt.wantErr)
+				return
 			}
 		})
 	}
