@@ -1,4 +1,8 @@
 ![workflow badge](https://github.com/iljaSL/dormant/actions/workflows/ci.yml/badge.svg)
+[![Documentation](https://pkg.go.dev/badge/github.com/iljaSL/dormant?utm_source=godoc)](https://pkg.go.dev/github.com/iljaSL/dormant)
+[![Go Report Card](https://goreportcard.com/badge/github.com/iljaSL/dormant)](https://goreportcard.com/report/github.com/iljaSL/dormant)
+![Go Version](https://img.shields.io/github/go-mod/go-version/iljaSL/dormant)
+![Dormant Release](https://img.shields.io/github/v/release/iljaSL/dormant)
 
 Dormant is a go.mod dependencies analyzing tool. Find out which of your used dependencies are actively, inactively or sporadically maintained.
 
@@ -6,6 +10,7 @@ Dormant is a go.mod dependencies analyzing tool. Find out which of your used dep
 
 
 - [Table of content](#table-of-content)
+- [Installation](#installation)
 - [Usage](#usage)
 - [Overview](#overview)
 - [Changing Default Values](#changing-default-values)
@@ -13,6 +18,18 @@ Dormant is a go.mod dependencies analyzing tool. Find out which of your used dep
 - [How To Contribute](#how-to-contribute)
 - [Bugs](#bugs)
 - [License](#license)
+
+# Installation
+Install:
+```
+go install github.com/iljaSL/dormant@latest
+```
+Run:
+```
+$GOPATH/dormant
+```
+Note: If you encounter an error while trying to run dormant with the message it cannot be found or is not defined, you may need to add 
+~/go/bin to your $GOPATH (MacOS/Linux), or %HOME%\go\bin (Windows).
 
 # Usage
 
